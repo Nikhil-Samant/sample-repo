@@ -50,6 +50,25 @@ app.MapGet("/weatherforecast", (HttpContext httpContext) =>
     .WithOpenApi()
     .RequireAuthorization();
 
+app.MapGet("/weatherforecast/{city}", (HttpContext httpContext, string city) =>
+    {
+        httpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+        var forecast = new WeatherForecast(
+            DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+            Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)]);
+        return forecast;
+    }).WithName("GetWeatherForecastByCity")
+    .WithOpenApi()
+    .RequireAuthorization();
+
+app.MapPatch("/weatherforecast/update-user-location", (HttpContext httpContext) =>
+    {
+        httpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
+        return "User location updated";
+    }).WithName("UpdateUserLocation")
+    .WithOpenApi();
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
